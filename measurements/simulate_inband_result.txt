@@ -1,0 +1,21 @@
+codec      rate  SNR  HELLO  OFFER0  OFFER18   (error-free / 10)
+g711       5/s  30dB     10     10     10
+g711       5/s  15dB     10     10     10
+g711       7/s  30dB     10     10     10
+g711       7/s  15dB     10     10     10
+gsm        5/s  30dB     10     10      7
+gsm        5/s  15dB     10      9      9
+gsm        7/s  30dB      7      7      3
+gsm        7/s  15dB     10     10      7
+g726_16k   5/s  30dB     10     10     10
+g726_16k   5/s  15dB     10     10     10
+g726_16k   7/s  30dB     10     10     10
+g726_16k   7/s  15dB     10     10     10
+opus_12k   5/s  30dB     10     10     10
+opus_12k   5/s  15dB     10     10     10
+opus_12k   7/s  30dB     10     10     10
+opus_12k   7/s  15dB     10     10     10
+opus_6k    5/s  30dB      9      9      5
+opus_6k    5/s  15dB      1      0      0
+opus_6k    7/s  30dB      5      4      2
+opus_6k    7/s  15dB      0      0      0
