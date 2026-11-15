@@ -31,7 +31,7 @@ callee (answers)                         caller
 
 - Frames are `* type data checkdigits #`, check digits ISO 7064 MOD 97-10 (as in IBAN).
 - In SIP calls, frames MUST be sent out of band (RFC 4733). In-band tones did not survive our mobile-network test (see measurements).
-- The callee sends ANNOUNCE at pickup, waits up to 2 seconds for a reply, then greets as usual. A caller sends HELLO only after an ANNOUNCE, so humans, IVR menus and agents that do not know the protocol never receive one.
+- The callee sends ANNOUNCE at pickup, waits half a second, then greets as usual; a HELLO that arrives during the greeting interrupts it. A caller sends HELLO only after an ANNOUNCE, so humans, IVR menus and agents that do not know the protocol never receive one.
 - The callee's domain comes from the call itself, never from a third-party source. This is what prevents a relay (man-in-the-middle) attack.
 
 Details, timing, error handling and security considerations: **[SPEC.md](SPEC.md)**.

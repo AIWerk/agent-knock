@@ -14,6 +14,7 @@ v0.3 builds on a rethink from 2026-11-14: if the caller finds the callee's A2A e
 - The AI announcement made in speech is no longer the trigger of the handshake but a transparency rule: whoever speaks with a human states that it is an AI (section 14).
 - The upper limit for the complete handshake is 60 seconds instead of 45, because of the longer domain.
 - Version code: `03`.
+- 2026-11-15: the listening window after the ANNOUNCE was shortened from 2 seconds to 0.5 seconds, so that a human caller hears no noticeable silence. A slower caller still gets in by interrupting the greeting (section 4).
 
 ## 1. Purpose and scope
 
@@ -96,7 +97,7 @@ The handshake is always made possible by the callee's ANNOUNCE frame and started
 **On the callee side**
 
 - On answering the call, before saying anything, the callee MUST send an ANNOUNCE frame. If the call is first taken by a menu system or a human and only later reaches the agent, the ANNOUNCE is sent when the agent takes over the call.
-- After the ANNOUNCE, the callee waits silently for at most 2 seconds (listening window). It starts the greeting when the window expires or when the caller starts speaking, whichever happens first.
+- After the ANNOUNCE, the callee waits silently for at most 0.5 seconds (listening window). It starts the greeting when the window expires or when the caller starts speaking, whichever happens first.
 - If a `*` arrives within the window, the callee stays silent and waits for the HELLO frame.
 - If the HELLO arrives during the greeting, the callee SHOULD stop speaking and continue with the handshake. It MUST accept the HELLO for 10 seconds from the end of the ANNOUNCE; after that it may ignore it.
 - At most one ANNOUNCE may be sent per call.
@@ -104,12 +105,12 @@ The handshake is always made possible by the callee's ANNOUNCE frame and started
 **On the caller side**
 
 - The caller may send HELLO only after a valid ANNOUNCE. Without an ANNOUNCE it MUST NOT send HELLO, even if the other end appears to be a machine.
-- The caller SHOULD send the HELLO as soon as possible after the ANNOUNCE, so that it stays within the listening window.
+- The caller SHOULD send the HELLO as soon as possible after the ANNOUNCE. A caller running on a language model will usually miss the short listening window; its HELLO then arrives during the greeting, which the callee interrupts. This is the expected case, not an error.
 - If the version in the ANNOUNCE is unknown to it, the caller does not send HELLO and continues with speech.
 - During the handshake neither agent speaks.
 - If no OFFER frame starts within 6 seconds after the end of the HELLO, the caller continues with speech. There is no retry.
 
-**Human caller.** Whether a human caller hears the ANNOUNCE depends on the network path. Where a gateway converts RFC 4733 events into audio, it is a tone of about 1 second after pickup. In the real-line test from a Swiss mobile phone no tone was audible at all (section 13). After it comes at most 2 seconds of silence, or the greeting right away if they speak.
+**Human caller.** Whether a human caller hears the ANNOUNCE depends on the network path. Where a gateway converts RFC 4733 events into audio, it is a tone of about 1 second after pickup. In the real-line test from a Swiss mobile phone no tone was audible at all (section 13). After it comes at most half a second of silence, or the greeting right away if they speak.
 
 ## 5. DTMF frame and transmission
 
@@ -331,7 +332,7 @@ Every error leads to the same place: the two parties continue the call with spee
 | Situation | Action |
 |---|---|
 | No ANNOUNCE arrives | The caller speaks and does not send HELLO. |
-| No `*` arrives within 2 seconds after the ANNOUNCE | The callee greets. It still accepts the HELLO for 10 seconds from the end of the ANNOUNCE. |
+| No `*` arrives within 0.5 seconds after the ANNOUNCE | The callee greets. It still accepts the HELLO for 10 seconds from the end of the ANNOUNCE. |
 | No OFFER starts within 6 seconds after the HELLO | The caller continues with speech. No retry. |
 | Wrong check digits, wrong length or reserved code | The receiver sends NAK, the sender repeats the frame (for the OFFER group, the whole group). At most 2 repetitions, then ABORT. |
 | Missing DOMAIN frame (more expected according to L) | The caller sends NAK 2 seconds after the last received frame. |
@@ -410,7 +411,7 @@ The protocol proves exactly one thing: at both ends of the data channel are the 
 ## 15. Open questions
 
 - Acceptability of the ANNOUNCE for human callers on paths where it becomes audible (for example landlines behind a gateway that renders RFC 4733 as audio): how disturbing is the tone after pickup? It must be tried with real callers before it is switched on on a live line.
-- Length of the listening window: are 2 seconds enough for a caller running on a language model, or will the HELLO typically arrive during the greeting?
+- Interrupting the greeting: with a 0.5-second listening window the HELLO of a caller running on a language model will usually arrive during the greeting. Can voice-agent platforms stop their own speech reliably on an incoming DTMF event?
 - Measurement of the complete handshake between two real agents over SIP, including the language model's response time.
 - ElevenLabs, sending side: does the keypad tone tool really use RFC 4733 with the option switched on, and at what rate does it send the signals? (Receiving side answered: incoming DTMF interrupted the greeting, see section 13, real-line test 2.)
 - Reverse direction: what should happen if only the caller has an endpoint and the callee does not?
@@ -422,9 +423,9 @@ The protocol proves exactly one thing: at both ends of the data channel are the 
 
 An assistant agent books an appointment at the Muster dental practice. The caller knows only the phone number (+41 31 123 45 67), which its principal gave it.
 
-1. **ANNOUNCE.** On answering the call, the practice's telephony layer sends: `*140360#` (14 = ANNOUNCE, 03 = version, 60 = check digits). Then it waits 2 seconds.
+1. **ANNOUNCE.** On answering the call, the practice's telephony layer sends: `*140360#` (14 = ANNOUNCE, 03 = version, 60 = check digits). Then it waits 0.5 seconds.
 
-2. **HELLO** (A = 739104), within the window
+2. **HELLO** (A = 739104), within the window or during the greeting
 
 ```
 *100373910455#
